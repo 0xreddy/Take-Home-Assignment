@@ -39,6 +39,6 @@ jobs:
         if: success() # Only deploy if the Docker build is successful
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.aws_account_id }}
-          docker tag web-app:latest ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/web-app:latest
-          docker push ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/web-app:latest
+          docker tag web-app:latest ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
+          docker push ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
           aws ecs update-service --cluster web-app --service web-app --force-new-deployment
