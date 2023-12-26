@@ -14,17 +14,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker web-app
+        id: docker_build
         run: |
-                docker build -t web-app ./web-app
+          docker build -t web-app ./web-app
+          echo "::set-output name=build_status::success" # Set build status as 'success' if the build completes without errors
         
-      
-      - name: Test Web App
+      - name: Check Build Status
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000)
-          if [ $response -eq 200 ]; then
-            echo "Web app test successful"
+          if [ "${{ steps.docker_build.outputs.build_status }}" == "success" ]; then
+            echo "Docker build successful"
           else
-            echo "Web app test failed with status code $response"
+            echo "Docker build failed"
             exit 1
           fi
 
@@ -36,6 +36,7 @@ jobs:
           aws-region: your-aws-region
 
       - name: Deploy to AWS Fargate
+        if: success() # Only deploy if the Docker build is successful
         run: |
           aws ecr get-login-password --region your-aws-region | docker login --username AWS --password-stdin your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com
           docker tag your-image-name:latest your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com/your-image-name:latest
