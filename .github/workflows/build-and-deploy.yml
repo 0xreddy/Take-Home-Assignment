@@ -13,9 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build Docker image
+      - name: Build Docker web-app
         run: |
-          docker build -t your-image-name .
+                docker build -t web-app ./web-app
         
       
       - name: Test Web App
