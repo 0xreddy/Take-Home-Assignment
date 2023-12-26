@@ -38,7 +38,7 @@ jobs:
       - name: Deploy to AWS Fargate
         if: success() # Only deploy if the Docker build is successful
         run: |
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.aws_account_id }}
-          docker tag web-app:latest ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
-          docker push ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 834123678366
+          docker tag web-app:latest 834123678366.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
+          docker push 834123678366.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
           aws ecs update-service --cluster web-app --service web-app --force-new-deployment
