@@ -1,4 +1,14 @@
-name: Build and Deploy
+name: Build and deploy dev images for AWS ECS
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: my-ecr-repo
+  ECR_TAG: dev
+  ECS_SERVICE: flaskappdemo
+  ECS_CLUSTER: web-app
+  ECS_TASK_DEFINITION_NAME: test-app-image
+  ECS_TASK_DEFINITION_FILE: task-definition.json
+  ECS_CONTAINER: flask
 
 on:
   push:
@@ -6,44 +16,51 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build Image and Deploy ECS
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build Docker web-app
-        id: docker_build
-        run: |
-          docker build -t web-app ./web-app
-          echo "::set-output name=build_status::success" # Set build status as 'success' if the build completes without errors
-        
-      - name: Check Build Status
-        run: |
-          if [ "${{ steps.docker_build.outputs.build_status }}" == "success" ]; then
-            echo "Docker build successful"
-          else
-            echo "Docker build failed"
-            exit 1
-          fi
+      - name: Check out code
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push docker image to Amazon ECR
+      - name: Build, tag, and push the image to Amazon ECR
+        id: build-image
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: my-ecr-repo
-          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker tag web-app $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          # Build a docker container and push it to ECR
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$ECR_TAG .
+          echo "Pushing image to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$ECR_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$ECR_TAG"          
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_FILE }}          
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FILE }}
+          container-name: ${{ env.ECS_CONTAINER }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FILE }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
