@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build Docker web-app
         id: docker_build
@@ -26,10 +26,10 @@ jobs:
           else
             echo "Docker build failed"
             exit 1
-          fi
+
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -45,5 +45,14 @@ jobs:
           REPOSITORY: my-ecr-repo
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag web-app $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker build web-app $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: deploy to fargate
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: fargate-task
+          container-name: web-app
+          image: ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:${{ github.sha }}
+        
