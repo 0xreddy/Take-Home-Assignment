@@ -4,8 +4,8 @@ env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: flaskappdemo
   ECR_TAG: dev
-  ECS_SERVICE: flaskappdemo
-  ECS_CLUSTER: web-app
+  ECS_SERVICE: helloflast-service
+  ECS_CLUSTER: heeloflask
   ECS_TASK_DEFINITION_NAME: test-app-image
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CONTAINER: flask
