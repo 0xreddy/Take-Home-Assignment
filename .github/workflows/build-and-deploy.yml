@@ -35,10 +35,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Deploy to AWS Fargate
-        if: success() # Only deploy if the Docker build is successful
+      # - name: Deploy to AWS Fargate
+      #   if: success() # Only deploy if the Docker build is successful
+      #   run: |
+      #     aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.aws_account_id }}.dkr.ecr.ap-south1.amazonaws.com
+      #     docker tag web-app:latest ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
+      #     docker push ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
+      #     aws ecs update-service --cluster web-app --service web-app --force-new-deployment
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+            ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         run: |
-          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.aws_account_id }}.dkr.ecr.ap-south1.amazonaws.com
-          docker tag web-app:latest ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
-          docker push ${{ secrets.aws_account_id }}.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
-          aws ecs update-service --cluster web-app --service web-app --force-new-deployment
+          docker build . -f ./app/Dockerfile -t $ECR_REGISTRY/web-app:latest
+          docker push $ECR_REGISTRY/web-app:
