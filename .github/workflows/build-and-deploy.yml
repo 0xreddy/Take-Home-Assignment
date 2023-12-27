@@ -6,7 +6,7 @@ env:
   ECR_TAG: dev
   ECS_SERVICE: helloflast-service
   ECS_CLUSTER: helloflask
-  ECS_TASK_DEFINITION_NAME: test-app-image
+  ECS_TASK_DEFINITION_NAME: helloflask
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CONTAINER: flask
 
