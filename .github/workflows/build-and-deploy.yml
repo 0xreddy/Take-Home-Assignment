@@ -36,7 +36,7 @@ jobs:
 
       - name: Build and push Docker image to GCR
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} ./web-app  # Specify the Dockerfile directory
+          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} ./web-app
           echo "Built image: gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }}"
 
       - name: Deploy to Cloud Run
