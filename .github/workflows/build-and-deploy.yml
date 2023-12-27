@@ -12,6 +12,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - name: Build Docker web-app
+        id: docker_build
+        run: |
+          docker build -t web-app ./web-app
+          echo "::set-output name=build_status::success" # Set build status as 'success' if the build completes without errors
+        
+      - name: Check Build Status
+        run: |
+          if [ "${{ steps.docker_build.outputs.build_status }}" == "success" ]; then
+            echo "Docker build successful"
+          else
+            echo "Docker build failed"
+            exit 1
+          fi  
 
       # Authenticate with GCP using google-github-actions/auth
       - name: Set up Google Cloud SDK
