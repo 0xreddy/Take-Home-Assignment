@@ -45,4 +45,3 @@ jobs:
             --image gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} \
             --platform managed \
             --region us-central1
-            --port 5000
