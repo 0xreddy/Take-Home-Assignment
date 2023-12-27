@@ -18,22 +18,19 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          #export_default_credentials: true
 
       # Build and push the Docker image to GCR
       - name: Build and push Docker image
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }}
+          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} .
         env:
           IMAGE_NAME: web-app
 
       # Deploy the container to Cloud Run
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy <SERVICE_NAME> \
+          gcloud run deploy your-cloud-run-service \
             --image gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} \
             --platform managed \
             --region us-central1
-        env:
-          SERVICE_NAME: your-cloud-run-service
-
