@@ -7,4 +7,5 @@ def hello_world():
     return 'HELLO_WORLD from Flask!!'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=80)
+
