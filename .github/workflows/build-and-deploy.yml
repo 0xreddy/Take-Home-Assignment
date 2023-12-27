@@ -12,13 +12,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
+
       - name: Build Docker web-app
         id: docker_build
         run: |
           docker build -t web-app ./web-app
-          echo "::set-output name=build_status::success" # Set build status as 'success' if the build completes without errors
-        
+          echo "::set-output name=build_status::success"
+      
       - name: Check Build Status
         run: |
           if [ "${{ steps.docker_build.outputs.build_status }}" == "success" ]; then
@@ -26,23 +26,19 @@ jobs:
           else
             echo "Docker build failed"
             exit 1
-          fi  
+          fi
 
-      # Authenticate with GCP using google-github-actions/auth
       - name: Set up Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           #export_default_credentials: true
 
-      # Build and push the Docker image to GCR
-      - name: Build and push Docker image
+      - name: Build and push Docker image to GCR
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} .
-        env:
-          IMAGE_NAME: web-app
+          gcloud builds submit --tag gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }} ./web-app  # Specify the Dockerfile directory
+          echo "Built image: gcr.io/${{ secrets.PROJECT_ID }}/web-app:${{ github.sha }}"
 
-      # Deploy the container to Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy your-cloud-run-service \
