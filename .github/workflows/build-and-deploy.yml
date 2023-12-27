@@ -17,7 +17,7 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/auth@v2
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ GCP_SA_KEY }}
           export_default_credentials: true
 
       # Build and push the Docker image to GCR
