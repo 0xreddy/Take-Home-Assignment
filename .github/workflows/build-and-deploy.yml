@@ -50,10 +50,10 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: deploy to fargate
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: fargate-task
-          container-name: web-app
-          image: ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:${{ github.sha }}
+      # - name: deploy to fargate
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: fargate-task
+      #     container-name: web-app
+      #     image: ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:${{ github.sha }}
         
