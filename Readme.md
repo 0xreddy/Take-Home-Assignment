@@ -10,7 +10,7 @@ This project aims to deploy a simple Flask web app to AWS ECS Fargate using a CI
 ![Alt text](.github/images/Deploy%20Pipeline.png)
 
 
-##  Best Practices
+##  Outline
 
 - **Flask Application**:
   - The Flask application is structured following best practices.
