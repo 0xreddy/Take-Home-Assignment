@@ -2,13 +2,13 @@ name: Build and deploy dev images for AWS ECS
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: flaskappdemo
+  ECR_REPOSITORY: test2
   ECR_TAG: dev
-  ECS_SERVICE: flaskapp
-  ECS_CLUSTER: flaskapp
-  ECS_TASK_DEFINITION_NAME: flaskapp
+  ECS_SERVICE: test43
+  ECS_CLUSTER: test43
+  ECS_TASK_DEFINITION_NAME: test2
   ECS_TASK_DEFINITION_FILE: task-definition.json
-  ECS_CONTAINER: flaskapp
+  ECS_CONTAINER: test2
 
 on:
   push:
