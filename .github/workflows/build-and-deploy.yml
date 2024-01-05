@@ -3,7 +3,7 @@ name: Build and deploy dev images for AWS ECS
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: test2
-  ECR_TAG: dev
+  ECR_TAG: test2.0
   ECS_SERVICE: test43
   ECS_CLUSTER: test43
   ECS_TASK_DEFINITION_NAME: test2
